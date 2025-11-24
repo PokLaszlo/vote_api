@@ -28,6 +28,7 @@ php artisan install:api parancsot futtatni
 - a táblák ugyanazok, mint fent
 - a táblák mezői a /docs táblában található "adatbazis_terv_elso.png" fájl alapján lesznek hozzáadva
 - pl. 
+```bash
     public function up(): void
     {
         Schema::create('tarsashaz', function (Blueprint $table) {
@@ -38,4 +39,4 @@ php artisan install:api parancsot futtatni
             // $table->timestamps();
         });
     }
-
+```

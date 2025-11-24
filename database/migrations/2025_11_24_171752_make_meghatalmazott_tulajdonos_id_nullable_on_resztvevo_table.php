@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kozgyules', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('tarsashaz_id')->constrained('alberlet');
-            $table->date('datum');
-            $table->boolean('megnyitva');
-            // $table->timestamps();
+        Schema::table('resztvevo', function (Blueprint $table) {
+            $table->unsignedBigInteger('meghatalmazott_tulajdonos_id')->nullable()->change();        
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kozgyules');
+        Schema::table('resztvevo', function (Blueprint $table) {
+            $table->unsignedBigInteger('meghatalmazott_tulajdonos_id')->change();
+        });
     }
 };

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('napirendi_pont', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kozgyules_id')->constrained('kozgyules');
-            $table->int("sorszam");
+            $table->integer("sorszam");
             $table->string("megnevezes",200);
             $table->boolean("aktiv");
             $table->boolean("lezart");

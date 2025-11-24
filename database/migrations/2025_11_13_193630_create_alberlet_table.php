@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('tarsashaz_id')->constrained('tarsashaz');
             $table->string('cim');
             $table->string('helyrajzszam');
-            $table->int("tulajdoni_hanyad_szamlalo");
-            $table->int("tulajdoni_hanyad_nevezo");
+            $table->integer("tulajdoni_hanyad_szamlalo");
+            $table->integer("tulajdoni_hanyad_nevezo");
             // $table->timestamps();
         });
     }
