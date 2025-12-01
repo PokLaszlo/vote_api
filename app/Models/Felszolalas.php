@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Felszolalas extends Model
 {
     protected $table = 'felszolalas';
+    public $timestamps = false;
     public function napirendi_pont()
     {
         return $this->belongsTo(Napirendi_pont::class);

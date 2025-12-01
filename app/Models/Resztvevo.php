@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Resztvevo extends Model
 {
     protected $table = 'resztvevo';
+    public $timestamps = false;
     public function felszolalas(){
         return $this->hasMany(Felszolalas::class);
     }

@@ -17,7 +17,7 @@ class TulajdonosController extends Controller
         $tulajdonos = new Tulajdonos();
         $tulajdonos->alberlet_id = $request["alberlet_id"];
         $tulajdonos->nev = $request["nev"];
-        $tulajdons->email = $request["email"];
+        $tulajdonos->email = $request["email"];
         $tulajdonos->jelszo =bcrypt($request["jelszo"]);
         $tulajdonos->save();
         return response()->json($tulajdonos);
@@ -26,7 +26,7 @@ class TulajdonosController extends Controller
         $tulajdonos = Tulajdonos::find($id);
         $tulajdonos->alberlet_id = $request["alberlet_id"];
         $tulajdonos->nev = $request["nev"];
-        $tulajdons->email = $request["email"];
+        $tulajdonos->email = $request["email"];
         $tulajdonos->jelszo =bcrypt($request["jelszo"]);
         $tulajdonos->update();
         return response()->json($tulajdonos);

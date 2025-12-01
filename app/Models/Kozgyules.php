@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Kozgyules extends Model
 {
     protected $table = 'kozgyules';
+    public $timestamps = false;
     public function tarsashaz()
     {
         return $this->belongsTo(Tarsashaz::class);

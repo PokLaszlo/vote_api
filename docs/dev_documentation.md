@@ -19,16 +19,15 @@ php artisan install:api parancsot futtatni
 php artisan make:controller api/tablanevController
 ```
 - Táblanevek:
-<ul>
-     Tarsashaz, 
-     Alberlet, 
-     Kozgyules, 
-     Tulajdonos, 
-     Nepirendi_pont, 
-     Szavazat, 
-     Resztvevo, 
-     Felszolalas
-</ul>
+  - Tarsashaz, 
+  - Alberlet, 
+  - Kozgyules, 
+  - Tulajdonos, 
+  - Nepirendi_pont, 
+  - Szavazat, 
+  - Resztvevo, 
+  - Felszolalas
+
 
 ## Migrációk hozzáadása
 ```bash
@@ -208,3 +207,16 @@ class ExampleController extends Controller
 - saját response kontroller kialakítása majd a jobb válaszok reményében
 - felhasználó kezelés, beléptetés, regisztráció, kiléptetés
 - jelszótárolás titkosítva 
+
+## A jelenlegi állás 2025.12.01-ével
+
+- végpontok tesztelve, és a hiba okának megoldása:
+```bash 
+Modelleken belül a következő két parancsot kell kiadni:
+
+protected $table = "given_table_name";
+public $timestamps = false;
+```
+- az eddigi hibák okai a következők voltak
+  - a: a laravel alapértelmezetten az angol többes szám jelét (s) hozzáadja a beépített sql parancsához, példával élve a `User` modelt a `users` táblából keresi ki
+  - b: a `$timpestamps` változó hamis értékre való állításával megakadályozásba kerül a nem létező updated_at mező erőltetett felülírása
