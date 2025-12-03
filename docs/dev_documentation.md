@@ -1,3 +1,17 @@
+# Tartalomjegyzék
+- Tartalomjegyzék
+- Előkészületek
+- Verzió 0.001
+  - ha nem lenne letöltve a project
+  - Kontrollerek létrehozása
+  - Migrációk hozzáadása
+  - Modellek hozzáadása
+  - Adatbázis létrehozása
+  - Controllerek, vezérlők
+  - Végpontok
+  - Megoldandó problémák
+  - A jelenlegi állás 2025.12.01-jével
+
 # Előkészületek:
 - angular projekt létrehozása: composer create-project laravel/laravel projektnév
 - git inicializálása, majd első commitolás után push
@@ -196,10 +210,10 @@ class ExampleController extends Controller
 | /resztvevo | post | addResztvevo |
 | /resztvevo/{id} | put | updateResztvevo |
 | /resztvevo/{id} | delete | destroyResztvevo |
-| /napirendi_pont | get | getNapirendi_pont |
-| /napirendi_pont | post | addNapirendi_pont |
-| /napirendi_pont/{id} | put | updateNapirendi_pont |
-| /napirendi_pont/{id} | delete | deleteNapirendi_pont |
+| /napirendipont | get | getNapirendi_pont |
+| /napirendipont | post | addNapirendi_pont |
+| /napirendipont/{id} | put | updateNapirendi_pont |
+| /napirendipont/{id} | delete | deleteNapirendi_pont |
 
 ## Megoldandó problémák
 - végpontok tesztelése, mert valamiért adott táblaneveket nem talál
