@@ -19,6 +19,11 @@
 - ha nem lett volna meg, akkor kell egy 
 php artisan install:api parancsot futtatni
 
+# Verzió 0.02
+## Gondolatok
+- felhasználói jogkörök: admin, közjegyző, tulajdonos&meghatalmazott
+
+
 # Verzió 0.001
 ## ha nem lenne letöltve a project
 - `git clone <project_url>` vagy `git pull`
