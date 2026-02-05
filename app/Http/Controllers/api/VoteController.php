@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
 
 use App\Models\Resolution;
 use App\Models\Vote;
@@ -10,6 +12,7 @@ use App\Services\VoteService;
 
 class VoteController extends Controller
 {
+    use ApiResponse;
     public function __construct(
         protected VoteService $service
     ) {}
@@ -27,8 +30,9 @@ class VoteController extends Controller
 
     public function result(Resolution $resolution)
     {
-        return response()->json(
-            $this->service->calculateResult($resolution)
+        return $this->created(
+            $this->service->calculateResult($resolution),
+            "Szavazás eredmények"
         );
     }
 }

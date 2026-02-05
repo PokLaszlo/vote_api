@@ -43,11 +43,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(Vote::class);
     }
-
-    public function canDo(string $ability): bool
-    {
-        return app(AbilityService::class)->can($this, $ability);
-    }
-
-
 }

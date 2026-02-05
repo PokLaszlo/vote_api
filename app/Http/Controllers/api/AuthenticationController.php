@@ -8,17 +8,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Traits\ApiResponse;
 
 class AuthenticationController extends Controller
-{
-    public function register(Request $request)
+{   
+    use ApiResponse;
+    public function register(RegisterRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
-            'ownership_ratio' => 'required|numeric|min:0|max:100'
-        ]);
+        $data = $request->validate();
 
         $user = User::create([
             'name' => $data['name'],
@@ -30,38 +27,29 @@ class AuthenticationController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'message' => 'Sikeres regisztráció',
-            'token' => $token,
-            'user' => $user,
-        ], 201);
+        return $this->success(['token' => $token,'user' => $user],'Sikeres regisztráció', 201);
     }
     public function login(LoginRequest $request)
     {
         if (! Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'message' => 'Hibás email vagy jelszó.'
-            ], 401);
+            return $this->error("Hibás email vagy jelszó", 401);
         }
 
         $user = Auth::user();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'message' => 'Sikeres bejelentkezés',
+        return $this->success([
             'token' => $token,
             'user' => $user,
-        ]);
+        ],"Sikeres bejelentkezés", 201);
     }
 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
     
-        return response()->json([
-            'message' => 'Sikeres kijelentkezés'
-        ]);
+        return $this->success([] ,"Sikeres kijelentkezés"  ,200);
     }
 
 }

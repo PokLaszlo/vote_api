@@ -6,52 +6,38 @@ use Illuminate\Http\Request;
 use App\Models\Meeting;
 use App\Services\MeetingService;
 use App\Services\MeetingReportService;
+use App\Http\Resources\MeetingResource;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Traits\ApiResponse;
 
 class MeetingController extends Controller
-{
-
+{   
+    use ApiResponse;
     public function __construct(protected MeetingService $service
     ) {}
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return $this->service->index();
-    }
+        $meeting = $this->service->index();
 
-    /**
-     * Store a newly created resource in storage.
-     */
+        return $this->success(MeetingResource::collection($meeting),"Közgyűlések",200);
+    }
     public function store(Request $request)
     {
         $this->authorize('create', Meeting::class);
-
-        // $data = $request->validate([
-        //     'title' => 'required|string',
-        //     'meeting_date' => 'required|date',
-        //     'location' => 'required|string',
-        // ]);
-        return $this->service->create([
+        $meeting = $this->service->create([
             'title' => $request->title,
             'meeting_date' => $request->meeting_date,
             'location' => $request->location,
             'created_by' => auth()->id(),
         ]);
+        return $this->created($meeting,"Közgyűlés létrehozva");
     }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Meeting $meeting)
     {
-        return $this->service->show($meeting);
-    }
+        $meeting = $this->service->show($meeting);
 
-    /**
-     * Update the specified resource in storage.
-     */
+        return $this->success(new MeetingResource($meeting),"Közgyűlés részletei",200);
+    }
     public function update(Request $request, Meeting $meeting)
     {
         $this->authorize('update', $meeting);
@@ -61,21 +47,17 @@ class MeetingController extends Controller
             $request->only(['title','meeting_date','location'])
         );
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Meeting $meeting)
     {
         $this->authorize('delete', $meeting);
 
         $this->service->delete($meeting);
-        return response()->noContent();
+        return $this->noContent();
     }
 
     public function report(Meeting $meeting, MeetingReportService $m_r_service)
     {
-        return response()->json($m_r_service->generate($meeting));
+        return $this->created($m_r_service->generate($meeting),"Jegyzőkönyv");
     }
     public function pdf(Meeting $meeting, MeetingReportService $reportService)
     {

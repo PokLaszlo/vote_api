@@ -5,9 +5,11 @@ namespace App\Http\Controllers\api;
 use Illuminate\Http\Request;
 use App\Models\Resolution;
 use App\Services\ResolutionService;
+use App\Traits\ApiResponse;
 
 class ResolutionController
 {
+    use ApiResponse;
     public function __construct(
         protected ResolutionService $service
     ) {}
@@ -18,6 +20,7 @@ class ResolutionController
 
     public function store(Request $request)
     {
+        $this->authorize('create', Resolution::class);
         return $this->service->create($request->all());
     }
 
@@ -28,12 +31,14 @@ class ResolutionController
 
     public function update(Request $request, Resolution $resolution)
     {
+        $this->authorize('update', $resolution);
         return $this->service->update($resolution, $request->all());
     }
 
     public function destroy(Resolution $resolution)
     {
+        $this->authorize('delete', $resolution);
         $this->service->delete($resolution);
-        return response()->noContent();
+        return $this->noContent();
     }
 }

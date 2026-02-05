@@ -5,28 +5,36 @@ use App\Models\User;
 
 class AbilityService
 {
-    /**
-     * Create a new class instance.
-     */
-    public function __construct()
+    public function abilitiesFor(User $user): array
     {
-        //
+        return match ($user->role->name) {
+            'admin' => [
+                'meeting.create',
+                'meeting.update',
+                'meeting.delete',
+                'agenda.create',
+                'agenda.update',
+                'agenda.delete',
+                'resolution.create',
+                'resolution.update',
+                'resolution.delete',
+                'vote.cast',
+            ],
+
+            'owner' => [
+                'meeting.create',
+                'agenda.create',
+                'resolution.create',
+                'vote.cast',
+            ],
+
+            'observer' => [
+                'vote.cast',
+            ],
+
+            default => [],
+        };
     }
-    protected array $abilities = [
-        'admin' => [
-            'create-meeting',
-            'create-agenda-item',
-            'create-resolution',
-            'view-report',
-        ],
-        'owner' => [
-            'vote',
-            'view-report',
-        ],
-        'auditor' => [
-            'view-report',
-        ],
-    ];
 
     public function can(User $user, string $ability): bool
     {
