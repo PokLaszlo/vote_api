@@ -1,69 +1,27 @@
 <?php
-
 namespace App\Http\Controllers\api;
-
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\Meeting;
-use App\Services\MeetingService;
 use App\Services\MeetingReportService;
-use App\Http\Resources\MeetingResource;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
 
-class MeetingController extends Controller
-{   
-    use ApiResponse;
-    public function __construct(protected MeetingService $service
-    ) {}
-    public function index()
-    {
-        $meeting = $this->service->index();
-
-        return $this->success(MeetingResource::collection($meeting),"Közgyűlések",200);
+class MeetingController extends Controller {
+    public function index() {
+        return Meeting::with('creator')->get();
     }
-    public function store(Request $request)
-    {
+
+    public function show(Meeting $meeting) {
+        // Itt töltjük be a teljes fát: Napirend -> Határozat -> Szavazat -> Felhasználó
+        return $meeting->load(["creator", "agendaItems.resolutions.votes.user"]);
+    }
+
+    public function store(Request $request) {
         $this->authorize('create', Meeting::class);
-        $meeting = $this->service->create([
-            'title' => $request->title,
-            'meeting_date' => $request->meeting_date,
-            'location' => $request->location,
-            'created_by' => auth()->id(),
+        $data = $request->validate([
+            'title' => 'required|string',
+            'meeting_date' => 'required|date',
+            'location' => 'required|string',
         ]);
-        return $this->created($meeting,"Közgyűlés létrehozva");
-    }
-    public function show(Meeting $meeting)
-    {
-        $meeting = $this->service->show($meeting);
-
-        return $this->success(new MeetingResource($meeting),"Közgyűlés részletei",200);
-    }
-    public function update(Request $request, Meeting $meeting)
-    {
-        $this->authorize('update', $meeting);
-
-        return $this->service->update(
-            $meeting,
-            $request->only(['title','meeting_date','location'])
-        );
-    }
-    public function destroy(Meeting $meeting)
-    {
-        $this->authorize('delete', $meeting);
-
-        $this->service->delete($meeting);
-        return $this->noContent();
-    }
-
-    public function report(Meeting $meeting, MeetingReportService $m_r_service)
-    {
-        return $this->created($m_r_service->generate($meeting),"Jegyzőkönyv");
-    }
-    public function pdf(Meeting $meeting, MeetingReportService $reportService)
-    {
-        $report = $reportService->generate($meeting);
-
-        return Pdf::loadView('reports.meeting', compact('report'))
-            ->download('jegyzokonyv.pdf');
+        return Meeting::create([...$data, 'created_by' => auth()->id()]);
     }
 }

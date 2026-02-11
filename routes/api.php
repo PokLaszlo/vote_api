@@ -7,52 +7,42 @@ use App\Http\Controllers\api\MeetingController;
 use App\Http\Controllers\api\ResolutionController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\VoteController;
-use App\Http\Controllers\api\AuthenticationController;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
+// LOGIN ÚTVONAL
+Route::post('/login', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+    $user = User::where('email', $request->email)->first();
 
-Route::post('/register', [AuthenticationController::class, 'register']);
-Route::post('/login', [AuthenticationController::class, 'login']);
+    if (! $user || ! Hash::check($request->password, $user->password)) {
+        return response()->json(['message' => 'Hibás belépési adatok.'], 401);
+    }
 
+    return response()->json([
+        'token' => $user->createToken('api-token')->plainTextToken,
+        'user' => $user->load('role')
+    ]);
+});
+
+// VÉDETT ÚTVONALAK
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthenticationController::class, 'logout']);
-    Route::get('/me', fn () => auth()->user());
+    Route::get('/user', function (Request $request) {
+        return $request->user()->load('role');
+    });
 
-    /*Meetings (Közgyűlések)*/
+    Route::apiResource('meetings', MeetingController::class);
+    Route::apiResource('agenda-items', AgendaItemController::class)->except(['index','show']);
+    Route::apiResource('resolutions', ResolutionController::class)->only(['store','show', 'update']);
 
-    Route::get('/meetings', [MeetingController::class, 'index']);
-    Route::post('/meetings', [MeetingController::class, 'store']);
-    Route::get('/meetings/{meeting}', [MeetingController::class, 'show']);
-    Route::put('/meetings/{meeting}', [MeetingController::class, 'update']);
-    Route::delete('/meetings/{meeting}', [MeetingController::class, 'destroy']);
+    Route::post('/resolutions/{resolution}/vote', [VoteController::class, 'store']);
+    Route::get('/resolutions/{resolution}/result', [VoteController::class, 'result']);
 
-    // Jegyzőkönyv
+    Route::apiResource('users', UserController::class)->only(['index','show']);
     Route::get('/meetings/{meeting}/report', [MeetingController::class, 'report']);
-    Route::get('/meetings/{meeting}/pdf', [MeetingController::class, 'pdf']);
-
-    /* Agenda Items (Napirendi pontok) */
-    Route::post('/agenda-items', [AgendaItemController::class, 'store']);
-    Route::put('/agenda-items/{agendaItem}', [AgendaItemController::class, 'update']);
-    Route::delete('/agenda-items/{agendaItem}', [AgendaItemController::class, 'destroy']);
-
-    //Resolutions (Határozatok)
-    
-    Route::get('/resolutions', [ResolutionController::class, 'index']);
-    Route::post('/resolutions', [ResolutionController::class, 'store']);
-    Route::get('/resolutions/{resolution}', [ResolutionController::class, 'show']);
-    Route::put('/resolutions/{resolution}', [ResolutionController::class, 'update']);
-    Route::delete('/resolutions/{resolution}', [ResolutionController::class, 'destroy']);
-
-    //Voting (Szavazás)
-    Route::post('/resolutions/{resolution}/vote',[VoteController::class, 'store']);
-
-    //Users (Felhasználók)
-    Route::get('/users', [UserController::class, 'index']);
-    Route::post('/users', [UserController::class, 'store']);
-    Route::get('/users/{user}', [UserController::class, 'show']);
-    Route::put('/users/{user}', [UserController::class, 'update']);
-    Route::delete('/users/{user}', [UserController::class, 'destroy']);
 });
