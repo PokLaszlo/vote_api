@@ -19,7 +19,7 @@ class VoteController extends Controller
 
     public function store(Request $request, Resolution $resolution)
     {
-        $this->authorize('vote', $resolution);
+        // $this->authorize('vote', $resolution);
 
         return $this->service->vote(
             auth()->user(),
