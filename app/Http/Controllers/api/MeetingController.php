@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
 
 use App\Models\Meeting;
 use App\Models\AgendaItem;
 use App\Models\Resolution;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -53,6 +54,25 @@ class MeetingController extends Controller
             });
         } catch (\Exception $e) {
             return response()->json(['message' => 'Hiba történt: ' . $e->getMessage()], 500);
+        }
+    }
+    public function show($id)
+    {
+        $meeting = \App\Models\Meeting::find($id);
+    
+        if (!$meeting) {
+            return response()->json(['error' => 'A meeting rekord nem létezik az adatbázisban ID: ' . $id], 404);
+        }
+        try {
+            // Lekérjük a meetinget a kapcsolódó adatokkal együtt
+            return $meeting->load([
+                'agenda_items.resolutions.votes'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Meeting nem található',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

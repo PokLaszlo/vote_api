@@ -13,6 +13,16 @@ class AgendaItemController
     public function __construct(
         protected AgendaItemService $service
     ) {}
+    public function index() {
+        return AgendaItem::with(['resolutions', 'votes'])->get();
+    }
+    
+    public function show(AgendaItem $agendaItem)
+    {
+        // Egy konkrét elem megjelenítése szavazatokkal/határozatokkal
+        $agendaItem->load(['resolutions', 'votes']); 
+        return $this->success($agendaItem);
+    }
     public function store(Request $request)
     {
         $this->authorize('create', AgendaItem::class);
@@ -20,8 +30,19 @@ class AgendaItemController
     }
     public function update(Request $request, AgendaItem $agendaItem)
     {
-        $this->authorize('update', $agendaItem);
-        return $this->service->update($agendaItem, $request->all());
+        // $this->authorize('update', $agendaItem);
+        // return $this->service->update($agendaItem, $request->all());
+        try {
+            $agendaItem->status = $request->status;
+            $agendaItem->save();
+            
+            return response()->json($agendaItem->load("resolutions",'votes'));
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString() // Ez megmondja pontosan hol a hiba
+            ], 500);
+        }
     }
     public function destroy(AgendaItem $agendaItem)
     {

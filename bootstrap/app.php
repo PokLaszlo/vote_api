@@ -25,7 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
             //'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
             'ability' => CheckForAnyAbility::class,
             'abilities' => CheckAbilities::class,
-            "role" => \App\Http\Middleware\AdminMiddleware::class
+            "role" => \App\Http\Middleware\AdminMiddleware::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
 
             //"limiter" => ThrottleRequests::class.":5,1",
             //"role" => \App\Http\Middleware\CheckIsAdmin::class,

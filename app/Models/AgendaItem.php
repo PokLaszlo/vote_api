@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AgendaItem extends Model
 {
@@ -17,8 +18,12 @@ class AgendaItem extends Model
         return $this->belongsTo(Meeting::class);
     }
 
-    public function resolutions()
-    {
-        return $this->hasMany(Resolution::class);
+    public function resolutions() {
+    return $this->hasMany(Resolution::class);
+    }
+    
+    // Ha a szavazatokat közvetlenül az AgendaItem-en keresztül akarod elérni:
+    public function votes() {
+        return $this->hasManyThrough(Vote::class, Resolution::class);
     }
 }
