@@ -1,27 +1,58 @@
 <?php
-namespace App\Http\Controllers\api;
-use App\Http\Controllers\Controller;
+
+namespace App\Http\Controllers;
+
 use App\Models\Meeting;
-use App\Services\MeetingReportService;
+use App\Models\AgendaItem;
+use App\Models\Resolution;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
-class MeetingController extends Controller {
-    public function index() {
-        return Meeting::with('creator')->get();
-    }
-
-    public function show(Meeting $meeting) {
-        // Itt töltjük be a teljes fát: Napirend -> Határozat -> Szavazat -> Felhasználó
-        return $meeting->load(["creator", "agendaItems.resolutions.votes.user"]);
-    }
-
-    public function store(Request $request) {
-        $this->authorize('create', Meeting::class);
-        $data = $request->validate([
-            'title' => 'required|string',
-            'meeting_date' => 'required|date',
-            'location' => 'required|string',
+class MeetingController extends Controller
+{
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'meeting_date' => 'required|date|after:now',
+            'location' => 'required|string|max:255',
+            'agenda_items' => 'required|array|min:1',
+            'agenda_items.*.title' => 'required|string',
+            'agenda_items.*.description' => 'nullable|string',
+            'agenda_items.*.resolution_text' => 'required|string',
         ]);
-        return Meeting::create([...$data, 'created_by' => auth()->id()]);
+
+        try {
+            return DB::transaction(function () use ($validated) {
+                // 1. Közgyűlés létrehozása
+                $meeting = Meeting::create([
+                    'title' => $validated['title'],
+                    'meeting_date' => $validated['meeting_date'],
+                    'location' => $validated['location'],
+                    'created_by' => Auth::id(),
+                ]);
+
+                // 2. Napirendi pontok és határozatok létrehozása
+                foreach ($validated['agenda_items'] as $itemData) {
+                    $item = AgendaItem::create([
+                        'meeting_id' => $meeting->id,
+                        'title' => $itemData['title'],
+                        'description' => $itemData['description'],
+                        'status' => 'PENDING'
+                    ]);
+
+                    Resolution::create([
+                        'agenda_item_id' => $item->id,
+                        'text' => $itemData['resolution_text'],
+                        'requires_unanimous' => false
+                    ]);
+                }
+
+                return response()->json(['message' => 'Közgyűlés sikeresen létrehozva!', 'id' => $meeting->id], 201);
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Hiba történt: ' . $e->getMessage()], 500);
+        }
     }
 }

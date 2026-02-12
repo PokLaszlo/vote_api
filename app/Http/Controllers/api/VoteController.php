@@ -3,36 +3,31 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
-
-use App\Models\Resolution;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Vote;
-use App\Services\VoteService;
 
 class VoteController extends Controller
 {
-    use ApiResponse;
-    public function __construct(
-        protected VoteService $service
-    ) {}
+    public function castVote(Request $request) {
+    $validated = $request->validate([
+        'resolution_id' => 'required|exists:resolutions,id',
+        'vote' => 'required|in:yes,no,abstain'
+    ]);
 
-    public function store(Request $request, Resolution $resolution)
-    {
-        // $this->authorize('vote', $resolution);
+    $existingVote = Vote::where('user_id', Auth::id())
+            ->where('resolution_id', $request->resolution_id)
+            ->first();
 
-        return $this->service->vote(
-            auth()->user(),
-            $resolution,
-            $request->vote
-        );
-    }
+        if ($existingVote) {
+            return response()->json(['message' => 'Már szavazott ezen a ponton!'], 403);
+        }
 
-    public function result(Resolution $resolution)
-    {
-        return $this->created(
-            $this->service->calculateResult($resolution),
-            "Szavazás eredmények"
-        );
-    }
+    $vote = Vote::updateOrCreate(
+        ['user_id' => auth()->id(), 'resolution_id' => $validated['resolution_id']],
+        ['vote' => $validated['vote']]
+    );
+
+    return response()->json(['message' => 'Sikeres szavazat!', 'vote' => $vote]);
+}
 }

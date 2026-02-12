@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("title");
             $table->foreignId("meeting_id")->constrained("meetings")->cascadeOnDelete();
+            $table->enum('status', ['PENDING', 'ACTIVE', 'CLOSED'])->default('PENDING');
             $table->text("description")->nullable();
             $table->timestamps();
         });

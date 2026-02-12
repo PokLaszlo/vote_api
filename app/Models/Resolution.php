@@ -25,4 +25,19 @@ class Resolution extends Model
     {
         return $this->hasMany(Vote::class);
     }
+     public function getResultsAttribute() {
+        return [
+            'yes' => $this->votes()->where('vote', 'yes')->join('users', 'votes.user_id', '=', 'users.id')->sum('users.ownership_ratio'),
+            'no' => $this->votes()->where('vote', 'no')->join('users', 'votes.user_id', '=', 'users.id')->sum('users.ownership_ratio'),
+            'abstain' => $this->votes()->where('vote', 'abstain')->join('users', 'votes.user_id', '=', 'users.id')->sum('users.ownership_ratio'),
+        ];
+        foreach ($this->votes as $vote) {
+            $ratio = $vote->user->ownership_ratio;
+            $results[$vote->vote] += $ratio;
+            $results['total_voted_ratio'] += $ratio;
+        }
+
+        return $results;
+    
+    }
 }
