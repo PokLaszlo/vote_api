@@ -13,6 +13,9 @@ class AdminMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
+    public function boot(){
+        
+    }
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->check()) { 

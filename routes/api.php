@@ -16,14 +16,14 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/meetings', [MeetingController::class, 'index']);
-    Route::get('/meetings/{id}', [MeetingController::class, 'show']);
+    Route::get('/meetings/{meeting}', [MeetingController::class, 'getMeeting']);
     Route::post('/votes', [VoteController::class, 'castVote']);
     Route::get('/agenda-items', [AgendaItemController::class, 'index']);
 
     // Admin funkciók
     Route::middleware('admin')->group(function () {
         Route::put('/agenda-items/{id}/status', [MeetingController::class, 'updateStatus']);
-        Route::post('/meetings', [MeetingController::class, 'store']);
+        Route::post('/meetings', [MeetingController::class, 'create']);
         Route::post('/agenda-items', [AgendaItemController::class, 'store']);
         Route::put('/agenda-items/{agendaItem}', [AgendaItemController::class, 'update']);
         Route::delete('/agenda-items/{agendaItem}', [AgendaItemController::class, 'destroy']);
