@@ -16,9 +16,7 @@ class MeetingService
     public function __construct(
         protected AgendaItemService $agendaItemService,
         protected ResolutionService $resolutionService
-    )
-    {
-    }
+    ){}
 
     public function create(array $data): Meeting
     {

@@ -8,7 +8,7 @@ class ResolutionService
 {
     public function index()
     {
-        return Resolution::with('agendaItem')->get();
+        return Resolution::with('agendaItem', 'votes.user')->get();
     }
 
     public function create(array $data): Resolution
@@ -18,7 +18,7 @@ class ResolutionService
 
     public function show(Resolution $resolution): Resolution
     {
-        return $resolution->load('votes.user');
+        return $resolution->load("agendaItem",'votes.user');
     }
 
     public function update(Resolution $resolution, array $data): Resolution

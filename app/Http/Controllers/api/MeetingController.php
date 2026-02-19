@@ -25,6 +25,11 @@ class MeetingController extends Controller
     {
         return $this->meetingService->show($meeting);
     }
+
+    public function getMeetings(){
+        return Meeting::all();
+    }
+
     public function update(Meeting $meeting, UpdateMeetingRequest $request)
     {
         $validated = $request->validated();

@@ -20,24 +20,32 @@ class ResolutionController
 
     public function store(Request $request)
     {
-        $this->authorize('create', Resolution::class);
-        return $this->service->create($request->all());
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'agenda_item_id' => 'required|exists:agenda_items,id',
+        ]);
+        return $this->service->create($validated);
     }
 
     public function show(Resolution $resolution)
     {
+        
         return $this->service->show($resolution);
     }
 
     public function update(Request $request, Resolution $resolution)
     {
-        $this->authorize('update', $resolution);
-        return $this->service->update($resolution, $request->all());
+        $validated = $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'sometimes|string'
+        ]);
+        return $this->service->update($resolution, $validated);
     }
 
     public function destroy(Resolution $resolution)
     {
-        $this->authorize('delete', $resolution);
         $this->service->delete($resolution);
         return $this->noContent();
     }

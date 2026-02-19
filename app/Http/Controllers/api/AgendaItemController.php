@@ -46,7 +46,7 @@ class AgendaItemController
     }
     public function destroy(AgendaItem $agendaItem)
     {
-        $this->authorize('delete', $agendaItem);
+        // $this->authorize('delete', $agendaItem);
         $this->service->delete($agendaItem);
         return $this->noContent();
     }
