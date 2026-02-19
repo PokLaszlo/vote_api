@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Resolution;
 use App\Models\User;
 use App\Models\Vote;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class VoteService
 {

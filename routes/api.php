@@ -12,7 +12,6 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
@@ -36,7 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/agenda-items/{agendaItem}', [AgendaItemController::class, 'update']);
     Route::delete('/agenda-items/{agendaItem}', [AgendaItemController::class, 'destroy']);
     
-    Route::post('/resolutions', [ResolutionController::class, 'create']);
+    Route::post('/resolutions', [ResolutionController::class, 'store']);
     Route::get('/resolutions', [ResolutionController::class, 'getResolutions']);
     Route::get('/resolutions/{resolution}', [ResolutionController::class, 'getResolution']);
     Route::put('/resolutions/{resolution}', [ResolutionController::class, 'update']);
