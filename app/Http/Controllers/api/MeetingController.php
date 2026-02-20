@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\api;
 
 use App\Models\Meeting;
-use App\Models\AgendaItem;
-use App\Models\Resolution;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\MeetingRequest;
@@ -27,7 +25,8 @@ class MeetingController extends Controller
     }
 
     public function getMeetings(){
-        return Meeting::all();
+        // Fontos a kapcsolatok betöltése, hogy az Admin Dashboard lássa a pontokat
+        return Meeting::with(['agenda_items.resolutions.votes'])->orderBy('created_at', 'desc')->get();
     }
 
     public function update(Meeting $meeting, UpdateMeetingRequest $request)
@@ -35,9 +34,21 @@ class MeetingController extends Controller
         $validated = $request->validated();
         return $this->meetingService->update($meeting, $validated);
     }
+
     public function delete(Meeting $meeting)
     {
-        return $this->meetingService->delete($meeting);
+        try {
+            $this->meetingService->delete($meeting);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Közgyűlés sikeresen törölve'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hiba történt: ' . $e->getMessage()
+            ], 500);
+        }
     }
-
 }
